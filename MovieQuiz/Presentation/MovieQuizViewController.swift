@@ -104,6 +104,7 @@ final class MovieQuizViewController: UIViewController {
         // сбрасываем рамку для нового вопроса
         imageView.layer.borderWidth = 0
         imageView.layer.borderColor = UIColor.clear.cgColor
+        imageView.layer.cornerRadius = 20
     }
     
     // приватный метод для показа результатов раунда квиза
@@ -136,6 +137,7 @@ final class MovieQuizViewController: UIViewController {
         }
         
         imageView.layer.masksToBounds = true
+        imageView.layer.cornerRadius = 20
         imageView.layer.borderWidth = 8
         imageView.layer.borderColor = isCorrect ? UIColor(named: "YP Green")?.cgColor : UIColor(named: "YP Red")?.cgColor
         
