@@ -44,6 +44,11 @@
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="a6B-Bq-rPM" secondAttribute="height" multiplier="2:3" id="HQT-UC-Isy"/>
                                         </constraints>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                                <integer key="value" value="20"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
                                     </imageView>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Рейтинг этого фильма меньше, чем 5?" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bLe-ru-AIX" userLabel="Question Label">
                                         <rect key="frame" x="0.0" y="624.5" width="374" height="99.5"/>
@@ -110,6 +115,14 @@
                                     </stackView>
                                 </subviews>
                             </stackView>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="9KX-zj-GkW">
+                                <rect key="frame" x="197" y="438" width="20" height="20"/>
+                                <color key="color" name="YP White"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="20" id="activity-width"/>
+                                    <constraint firstAttribute="height" constant="20" id="activity-height"/>
+                                </constraints>
+                            </activityIndicatorView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" name="YP Black"/>
@@ -118,12 +131,18 @@
                             <constraint firstItem="67S-Xc-qWu" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="10" id="mUb-Rs-FlD"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="67S-Xc-qWu" secondAttribute="bottom" id="p6V-Uc-4qY"/>
                             <constraint firstItem="67S-Xc-qWu" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="wce-9i-3B4"/>
+                            <constraint firstItem="9KX-zj-GkW" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="activity-centerX"/>
+                            <constraint firstItem="9KX-zj-GkW" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="activity-centerY"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="activityIndicator" destination="9KX-zj-GkW" id="gQm-n5-Spz"/>
                         <outlet property="counterLabel" destination="UAd-Cx-mgH" id="yVC-bX-xQQ"/>
                         <outlet property="imageView" destination="a6B-Bq-rPM" id="5WT-nf-2C1"/>
+                        <outlet property="noButton" destination="CBg-5e-IoR" id="no-button-outlet"/>
+                        <outlet property="questionTitleLabel" destination="Fvn-cC-aJm" id="question-title-outlet"/>
                         <outlet property="textLabel" destination="bLe-ru-AIX" id="fcG-4F-IPX"/>
+                        <outlet property="yesButton" destination="WE9-t8-2QK" id="yes-button-outlet"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
