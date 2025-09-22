@@ -14,6 +14,12 @@ struct GameResult {
     
     // метод сравнения по количеству верных ответов
     func isBetterThan(_ another: GameResult) -> Bool {
-        correct > another.correct
+        // Сначала сравниваем количество правильных ответов
+        if correct != another.correct {
+            return correct > another.correct
+        }
+        // Если правильных ответов одинаково, сравниваем по общему количеству вопросов
+        // (меньше вопросов при том же количестве правильных = лучше)
+        return total < another.total
     }
 }

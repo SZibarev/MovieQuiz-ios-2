@@ -5,6 +5,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private var textLabel: UILabel!
     @IBOutlet private var counterLabel: UILabel!
+    @IBOutlet private var questionTitleLabel: UILabel!
+    @IBOutlet private var yesButton: UIButton!
+    @IBOutlet private var noButton: UIButton!
+    @IBOutlet private var activityIndicator: UIActivityIndicatorView!
     
     // MARK: - Private Properties
     // переменная с индексом текущего вопроса, начальное значение 0 
@@ -52,16 +56,19 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     // MARK: - Private Methods
     // приватный метод конвертации, который принимает моковый вопрос и возвращает вью модель для главного экрана
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
-        let questionStep = QuizStepViewModel( // 1
-            image: UIImage(named: model.image) ?? UIImage(), // 2
-            question: model.text, // 3
-            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)") // 4
-        return questionStep
+        return QuizStepViewModel(
+            image: UIImage(data: model.image) ?? UIImage(),
+            question: model.text,
+            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
     }
     
     // приватный метод вывода на экран вопроса, который принимает на вход вью модель вопроса и ничего не возвращает
     private func show(quiz step: QuizStepViewModel) {
+        hideLoadingIndicator() // скрываем индикатор загрузки при показе вопроса
+        
+        imageView.isHidden = false // показываем imageView
         imageView.image = step.image
+        textLabel.isHidden = false // показываем textLabel
         textLabel.text = step.question
         textLabel.textColor = UIColor(named: "YP White")
         textLabel.numberOfLines = 0 // неограниченное количество строк
@@ -74,7 +81,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             textLabel.font = UIFont(name: "YSDisplay-Medium", size: 23)
         }
         
+        counterLabel.isHidden = false // показываем counterLabel
         counterLabel.text = step.questionNumber
+        
+        questionTitleLabel.isHidden = false // показываем questionTitleLabel
+        
+        yesButton.isHidden = false // показываем yesButton
+        noButton.isHidden = false // показываем noButton
         
         // сбрасываем рамку для нового вопроса
         imageView.layer.borderWidth = 0
@@ -148,6 +161,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             show(quiz: viewModel)
         } else {
             currentQuestionIndex += 1
+            showLoadingIndicator() // показываем индикатор загрузки при запросе следующего вопроса
             self.questionFactory?.requestNextQuestion()
         }
     }
@@ -155,13 +169,19 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        let questionFactory = QuestionFactory()
-        questionFactory.setup(delegate: self)        
-        self.questionFactory = questionFactory
-        
-        // запрашиваем первый вопрос
-        questionFactory.requestNextQuestion()
+       
+       imageView.layer.cornerRadius = 20
+        imageView.isHidden = true // скрываем imageView до загрузки данных
+        textLabel.isHidden = true // скрываем textLabel до загрузки данных
+        counterLabel.isHidden = true // скрываем counterLabel до загрузки данных
+        questionTitleLabel.isHidden = true // скрываем questionTitleLabel до загрузки данных
+        yesButton.isHidden = true // скрываем yesButton до загрузки данных
+        noButton.isHidden = true // скрываем noButton до загрузки данных
+        questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
+        statisticService = StatisticService()
+
+        showLoadingIndicator()
+        questionFactory?.loadData()
     }
     
     // MARK: - QuestionFactoryDelegate
@@ -176,6 +196,44 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         DispatchQueue.main.async { [weak self] in
             self?.show(quiz: viewModel)
         }
+    }
+    
+    func didLoadDataFromServer() {
+        activityIndicator.isHidden = true // скрываем индикатор загрузки
+        questionFactory?.requestNextQuestion()
+    }
+    
+    func didFailToLoadData(with error: Error) {
+        showNetworkError(message: error.localizedDescription) // возьмём в качестве сообщения описание ошибки
+    }
+    
+    // MARK: - Loading State
+    private func showLoadingIndicator() {
+        activityIndicator.isHidden = false // говорим, что индикатор загрузки не скрыт
+        activityIndicator.startAnimating() // включаем анимацию
+    }
+    
+    private func hideLoadingIndicator() {
+        activityIndicator.isHidden = true // скрываем индикатор загрузки
+        activityIndicator.stopAnimating() // останавливаем анимацию
+    }
+    
+    // MARK: - Error State
+    private func showNetworkError(message: String) {
+        hideLoadingIndicator() // скрываем индикатор загрузки
+        
+        let model = AlertModel(title: "Ошибка",
+                               message: message,
+                               buttonText: "Попробовать еще раз") { [weak self] in
+            guard let self = self else { return }
+            
+            self.currentQuestionIndex = 0
+            self.correctAnswers = 0
+            
+            self.questionFactory?.requestNextQuestion()
+        }
+        
+        alertPresenter.show(in: self, model: model)
     }
 }
 

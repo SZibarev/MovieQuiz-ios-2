@@ -77,6 +77,12 @@ final class StatisticService: StatisticServiceProtocol {
     }
     
     func store(correct count: Int, total amount: Int) {
+        // Проверяем корректность данных
+        guard count >= 0 && amount > 0 && count <= amount else {
+            print("Ошибка: некорректные данные для сохранения - correct: \(count), total: \(amount)")
+            return
+        }
+        
         // Увеличиваем счетчик игр
         gamesCount += 1
         
