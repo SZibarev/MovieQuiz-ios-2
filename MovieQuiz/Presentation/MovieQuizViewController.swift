@@ -32,22 +32,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     // MARK: - IB Actions
     // метод вызывается, когда пользователь нажимает на кнопку "Да" 
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
-        guard let currentQuestion = currentQuestion else {
-            return
-        }
-        let givenAnswer = true // 2
-        
-        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer) // 3
+        presenter.yesButtonClicked()
     }
     
     // метод вызывается, когда пользователь нажимает на кнопку "Нет" 
     @IBAction private func noButtonClicked(_ sender: UIButton) {
-        guard let currentQuestion = currentQuestion else {
-            return
-        }
-        let givenAnswer = false // 2
-        
-        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer) // 3
+        presenter.currentQuestion = currentQuestion
+        presenter.noButtonClicked()
     }
     
     // MARK: - Private Methods
@@ -102,7 +93,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     // приватный метод, который обрабатывает результат ответа 
     // принимает на вход булевое значение и ничего не возвращает
-    private func showAnswerResult(isCorrect: Bool) {
+    func showAnswerResult(isCorrect: Bool) {
         if isCorrect { // 1
             correctAnswers += 1 // 2
         }
@@ -159,6 +150,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        presenter.viewController = self
        
        imageView.layer.cornerRadius = 20
         imageView.isHidden = true // скрываем imageView до загрузки данных
@@ -181,6 +174,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
 
         currentQuestion = question
+        presenter.currentQuestion = question
         let viewModel = presenter.convert(model: question)
         
         DispatchQueue.main.async { [weak self] in
