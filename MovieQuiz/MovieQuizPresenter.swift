@@ -40,6 +40,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         currentQuestion = question
         let viewModel = convert(model: question)
         DispatchQueue.main.async { [weak self] in
+            self?.viewController?.hideLoadingIndicator()
             self?.viewController?.show(quiz: viewModel)
         }
     }
@@ -57,6 +58,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     func restartGame() {
         currentQuestionIndex = 0
         correctAnswers = 0
+        viewController?.showLoadingIndicator()
         questionFactory?.requestNextQuestion()
     }
 
@@ -113,6 +115,8 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
                 buttonText: "Сыграть ещё раз")
                 viewController?.show(quiz: viewModel)
         } else {
+            // Показываем индикатор загрузки при переходе к следующему вопросу
+            viewController?.showLoadingIndicator()
             self.switchToNextQuestion()
             questionFactory?.requestNextQuestion()
         }

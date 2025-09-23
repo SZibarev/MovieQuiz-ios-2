@@ -18,6 +18,11 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
         presenter = MovieQuizPresenter(viewController: self)
 
         imageView.layer.cornerRadius = 20
+        
+        // Настройка индикатора загрузки
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.style = .large
+        activityIndicator.color = UIColor(named: "YP White")
     }
 
     // MARK: - Actions
@@ -65,12 +70,11 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
     }
 
     func showLoadingIndicator() {
-        activityIndicator.isHidden = false // говорим, что индикатор загрузки не скрыт
         activityIndicator.startAnimating() // включаем анимацию
     }
 
     func hideLoadingIndicator() {
-        activityIndicator.isHidden = true
+        activityIndicator.stopAnimating() // останавливаем анимацию
     }
 
     func showNetworkError(message: String) {
