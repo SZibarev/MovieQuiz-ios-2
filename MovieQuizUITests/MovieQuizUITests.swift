@@ -21,6 +21,22 @@ final class MovieQuizUITests: XCTestCase {
         // то следующие тесты запускаться не будут; и правда, зачем ждать?
         continueAfterFailure = false  
     }
+    
+    private func waitForDataToLoad() {
+        // Ждем, пока приложение загрузится
+        let exists = app.wait(for: .runningForeground, timeout: 30)
+        XCTAssertTrue(exists)
+        
+        // Ждем, пока исчезнет индикатор загрузки
+        let activityIndicator = app.activityIndicators.firstMatch
+        if activityIndicator.exists {
+            XCTAssertFalse(activityIndicator.waitForNonExistence(timeout: 15))
+        }
+        
+        // Ждем, пока загрузятся данные и появится первый вопрос
+        let poster = app.images["Poster"]
+        XCTAssertTrue(poster.waitForExistence(timeout: 10))
+    }
     override func tearDownWithError() throws {
         try super.tearDownWithError()
         
@@ -41,11 +57,7 @@ final class MovieQuizUITests: XCTestCase {
     }
     
     func testYesButton() {
-        // Ждем, пока приложение загрузится
-        let exists = app.wait(for: .runningForeground, timeout: 30)
-        XCTAssertTrue(exists)
-        
-        sleep(3)
+        waitForDataToLoad()
         
         let firstPoster = app.images["Poster"]
         let firstPosterData = firstPoster.screenshot().pngRepresentation
@@ -63,7 +75,7 @@ final class MovieQuizUITests: XCTestCase {
     }
     
     func testNoButton() {
-        sleep(3)
+        waitForDataToLoad()
         
         let firstPoster = app.images["Poster"]
         let firstPosterData = firstPoster.screenshot().pngRepresentation
@@ -81,7 +93,8 @@ final class MovieQuizUITests: XCTestCase {
     }
     
     func testGameFinish() {
-        sleep(2)
+        waitForDataToLoad()
+        
         for _ in 1...10 {
             app.buttons["No"].tap()
             sleep(2)
@@ -98,7 +111,8 @@ final class MovieQuizUITests: XCTestCase {
     }
     
     func testAlertDismiss() {
-        sleep(2)
+        waitForDataToLoad()
+        
         for _ in 1...10 {
             app.buttons["No"].tap()
             sleep(2)

@@ -144,7 +144,6 @@
                         <outlet property="counterLabel" destination="UAd-Cx-mgH" id="yVC-bX-xQQ"/>
                         <outlet property="imageView" destination="a6B-Bq-rPM" id="5WT-nf-2C1"/>
                         <outlet property="noButton" destination="CBg-5e-IoR" id="no-button-outlet"/>
-                        <outlet property="questionTitleLabel" destination="Fvn-cC-aJm" id="question-title-outlet"/>
                         <outlet property="textLabel" destination="bLe-ru-AIX" id="fcG-4F-IPX"/>
                         <outlet property="yesButton" destination="WE9-t8-2QK" id="yes-button-outlet"/>
                     </connections>
