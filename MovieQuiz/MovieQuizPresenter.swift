@@ -13,6 +13,8 @@ final class MovieQuizPresenter {
     
     var currentQuestion: QuizQuestion?
     weak var viewController: MovieQuizViewController?
+    var correctAnswers: Int = 0
+    var questionFactory: QuestionFactoryProtocol?
     
     func isLastQuestion() -> Bool {
         currentQuestionIndex == questionsAmount - 1
@@ -35,22 +37,69 @@ final class MovieQuizPresenter {
     }
     
     func yesButtonClicked() {
+        didAnswer(isYes: true)
+    }
+    
+    func noButtonClicked() {
+        didAnswer(isYes: false)
+    }
+    
+    private func didAnswer(isYes: Bool) {
         guard let currentQuestion = currentQuestion else {
             return
         }
         
-        let givenAnswer = true
+        let givenAnswer = isYes
         
         viewController?.showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
     
-    func noButtonClicked() {
-        guard let currentQuestion = currentQuestion else {
+    func didReceiveNextQuestion(question: QuizQuestion?) {
+        guard let question = question else {
             return
         }
         
-        let givenAnswer = false
-        
-        viewController?.showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+        currentQuestion = question
+        let viewModel = convert(model: question)
+        DispatchQueue.main.async { [weak self] in
+            self?.viewController?.show(quiz: viewModel)
+        }
+    }
+    
+    func showNextQuestionOrResults() {
+        if self.isLastQuestion() {
+            // Сохраняем статистику игры
+            viewController?.statisticService.store(correct: correctAnswers, total: questionsAmount)
+            
+            // Создаем расширенное сообщение со статистикой
+            let currentGameText = correctAnswers == questionsAmount ?
+                "Поздравляем, вы ответили на \(questionsAmount) из \(questionsAmount)!" :
+                "Вы ответили на \(correctAnswers) из \(questionsAmount), попробуйте ещё раз!"
+            
+            let gamesCountText = "Количество сыгранных квизов: \(viewController?.statisticService.gamesCount ?? 0)"
+            
+            let bestGame = viewController?.statisticService.bestGame ?? GameResult(correct: 0, total: 0, date: Date())
+            let bestGameText = "Рекорд: \(bestGame.correct)/\(bestGame.total) (\(bestGame.date.dateTimeString))"
+            
+            let averageAccuracyText = "Средняя точность: \(String(format: "%.1f", viewController?.statisticService.totalAccuracy ?? 0.0))%"
+            
+            let fullMessage = """
+            \(currentGameText)
+            
+            \(gamesCountText)
+            \(bestGameText)
+            \(averageAccuracyText)
+            """
+            
+            let viewModel = QuizResultsViewModel(
+                title: "Этот раунд окончен!",
+                text: fullMessage,
+                buttonText: "Сыграть ещё раз")
+            viewController?.show(quiz: viewModel)
+        } else {
+            self.switchToNextQuestion()
+            viewController?.showLoadingIndicator() // показываем индикатор загрузки при запросе следующего вопроса
+            questionFactory?.requestNextQuestion()
+        }
     }
 }
